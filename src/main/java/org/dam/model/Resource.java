@@ -11,7 +11,7 @@ public class Resource {
     private Long id;
     @Column(unique = true, nullable = false)
     private String name;
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private int amount;
 
     public Resource(){}

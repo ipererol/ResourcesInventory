@@ -15,7 +15,8 @@
         <property name="show_sql">true</property>
 
         <!-- DDL generation configuration (create, update, validate, none) -->
-        <property name="hbm2ddl.auto">update</property>
+        <property name="hbm2ddl.auto">create</property>
 
+        <mapping class="org.dam.model.Resource" />
     </session-factory>
 </hibernate-configuration>
