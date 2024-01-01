@@ -31,23 +31,55 @@ public class ResourcePojo implements ResourceDAO{
 
     @Override
     public List<Resource> listResources() {
-        return null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Resource> cr = cb.createQuery(Resource.class);
+            Root<Resource> root = cr.from(Resource.class);
+            cr.select(root);
+            return session.createQuery(cr).getResultList();
+        } catch (HibernateException hibernateException){
+            System.err.println(hibernateException.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<Resource> listResourcesByName(String name) {
-        return null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Resource> cr = cb.createQuery(Resource.class);
+            Root<Resource> root = cr.from(Resource.class);
+            cr.select(root).where(cb.like(root.get("name"), "%"+name+"%"));
+            return session.createQuery(cr).getResultList();
+        } catch (HibernateException hibernateException){
+            System.err.println(hibernateException.getMessage());
+            return null;
+        }
     }
 
     @Override
     public Resource getResourceById(Long idResource) {
-        return null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            return session.get(Resource.class, idResource);
+        } catch (HibernateException hibernateException){
+            System.err.println(hibernateException.getMessage());
+            return null;
+        }
     }
 
     @Override
     public Resource getResourceByName(String name) {
-        return null;
-    }
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Resource> cr = cb.createQuery(Resource.class);
+            Root<Resource> root = cr.from(Resource.class);
+            cr.select(root);
+            cr.select(root).where(cb.equal(root.get("name"), name));
+            return session.createQuery(cr).getSingleResult();
+        } catch (HibernateException hibernateException){
+            System.err.println(hibernateException.getMessage());
+            return null;
+        }    }
 
     @Override
     public void updateResource(Resource resource) {

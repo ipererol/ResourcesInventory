@@ -4,14 +4,12 @@ import org.dam.exception.CommandInterpreterException;
 import org.dam.model.Resource;
 import org.dam.pojo.ResourcePojo;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class CommandInterpreter {
     public static void read(String sentence) throws CommandInterpreterException {
         String[] sentenceArray = sentence.split(" ", 3);
         String command = sentenceArray[0];
-        int amount = 0;
-        String resourceName = "";
         switch (command) {
             case Commands.LISTAR:
                 // Handle listar command
@@ -37,13 +35,29 @@ public class CommandInterpreter {
     }
 
     private static void handleListar() {
-        // Implementation for listar command
+        ResourcePojo resourcePojo = new ResourcePojo();
+        List<Resource> resources = resourcePojo.listResources();
+        if(resources.isEmpty()){
+            System.err.println("No hay recursos");
+        } else {
+            for(Resource resource : resources){
+                System.out.println(resource);
+            }
+        }
     }
 
     private static void handleHay(String[] sentenceArray) throws CommandInterpreterException {
         if (sentenceArray.length == 2) {
             String resourceName = sentenceArray[1];
-            // Implementation for hay command with resourceName
+            ResourcePojo resourcePojo = new ResourcePojo();
+            List<Resource> resources = resourcePojo.listResourcesByName(resourceName);
+            if(resources.isEmpty()){
+                System.err.println("No hay " + resourceName);
+            } else {
+                for(Resource resource : resources){
+                    System.out.println(resource);
+                }
+            }
         } else {
             throw new CommandInterpreterException("La sentencia hay requiere un valor de busqueda");
         }
