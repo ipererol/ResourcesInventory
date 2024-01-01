@@ -1,6 +1,8 @@
 package org.dam.util;
 
 import org.dam.exception.CommandInterpreterException;
+import org.dam.model.Resource;
+import org.dam.pojo.ResourcePojo;
 
 import java.util.Arrays;
 
@@ -19,8 +21,9 @@ public class CommandInterpreter {
                 handleHay(sentenceArray);
                 break;
             case Commands.USAR:
+                handleUsar(sentenceArray);
             case Commands.ADQUIRIR:
-                handleUsarAdquirir(sentenceArray);
+                handleAdquirir(sentenceArray);
                 break;
             case Commands.SALIR:
                 handleSalir();
@@ -28,6 +31,9 @@ public class CommandInterpreter {
             default:
                 throw new CommandInterpreterException("La opcion " + command + " no es una opcion valida");
         }
+    }
+
+    private static void handleUsar(String[] sentenceArray) {
     }
 
     private static void handleListar() {
@@ -43,11 +49,15 @@ public class CommandInterpreter {
         }
     }
 
-    private static void handleUsarAdquirir(String[] sentenceArray) throws CommandInterpreterException {
+    private static void handleAdquirir(String[] sentenceArray) throws CommandInterpreterException {
         if (sentenceArray.length == 3 && isNumeric(sentenceArray[1])) {
             int amount = Integer.parseInt(sentenceArray[1]);
             String resourceName = sentenceArray[2];
-            // Implementation for usar/adquirir command with amount and resourceName
+            ResourcePojo resourcePojo = new ResourcePojo();
+            Resource resource = new Resource();
+            resource.setAmount(amount);
+            resource.setName(resourceName);
+            resourcePojo.createOrUpdateResource(resource);
         } else {
             throw new CommandInterpreterException("La sentencia usar requiere un numero y un recurso");
         }
