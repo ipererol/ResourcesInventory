@@ -1,5 +1,6 @@
 package org.dam.pojo;
 
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -79,7 +80,11 @@ public class ResourcePojo implements ResourceDAO{
         } catch (HibernateException hibernateException){
             System.err.println(hibernateException.getMessage());
             return null;
-        }    }
+        } catch (NoResultException e) {
+            System.err.println("No hay " + name);
+            return null;
+        }
+    }
 
     @Override
     public void updateResource(Resource resource) {
@@ -121,19 +126,44 @@ public class ResourcePojo implements ResourceDAO{
         Transaction transaction = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             transaction = session.beginTransaction();
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<Resource> cr = cb.createQuery(Resource.class);
-            Root<Resource> root = cr.from(Resource.class);
-            cr.select(root).where(cb.equal(root.get("name"), resource.getName()));
-            List<Resource> storedResources = session.createQuery(cr).getResultList();
-            if(!storedResources.isEmpty()){
-                Resource storedResource = storedResources.getFirst();
+            Resource storedResource = this.getResourceByName(resource.getName());
+            if(storedResource != null){
                 storedResource.setAmount(resource.getAmount() + storedResource.getAmount());
                 resource = storedResource;
             }
             session.merge(resource);
+            System.out.println("Se ha adquirido " + resource.getAmount() + " de " + resource.getName() + " hay " + (storedResource != null ? storedResource.getAmount() : 0));
             transaction.commit();
         } catch (HibernateException exception){
+            if(transaction != null) {
+                transaction.rollback();
+            }
+            System.err.println(exception.getMessage());
+        }
+    }
+
+    @Override
+    public void updateOrDeleteResource(Resource resource) {
+        System.out.println("aqui");
+        Transaction transaction = null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            transaction = session.beginTransaction();
+            Resource storedResource = this.getResourceByName(resource.getName());
+            if(storedResource == null){
+                System.err.println("El recurso " + resource.getName() + " no existe");
+            } else {
+                if (storedResource.getAmount() > resource.getAmount()) {
+                    storedResource.setAmount(storedResource.getAmount() - resource.getAmount());
+                    session.merge(storedResource);
+                    System.out.println("Se ha utilizado " + resource.getAmount() + " de " + resource.getName() + " quedan " + storedResource.getAmount());
+                } else if (storedResource.getAmount() == resource.getAmount()) {
+                    session.remove(storedResource);
+                } else {
+                    System.err.println("No se pueden utilizar " + resource.getAmount() + " de " + resource.getName() + " porque solo quedan " + storedResource.getAmount());
+                }
+            }
+            transaction.commit();
+        }catch (HibernateException exception){
             if(transaction != null) {
                 transaction.rollback();
             }

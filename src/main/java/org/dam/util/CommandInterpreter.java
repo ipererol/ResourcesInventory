@@ -12,7 +12,6 @@ public class CommandInterpreter {
         String command = sentenceArray[0];
         switch (command) {
             case Commands.LISTAR:
-                // Handle listar command
                 handleListar();
                 break;
             case Commands.HAY:
@@ -20,6 +19,7 @@ public class CommandInterpreter {
                 break;
             case Commands.USAR:
                 handleUsar(sentenceArray);
+                break;
             case Commands.ADQUIRIR:
                 handleAdquirir(sentenceArray);
                 break;
@@ -31,7 +31,19 @@ public class CommandInterpreter {
         }
     }
 
-    private static void handleUsar(String[] sentenceArray) {
+    private static void handleUsar(String[] sentenceArray)  throws CommandInterpreterException {
+        if(sentenceArray.length == 3) {
+            String resourceName = sentenceArray[2];
+            int resourceAmout = Integer.parseInt(sentenceArray[1]);
+            ResourcePojo resourcePojo = new ResourcePojo();
+            Resource resource = new Resource();
+            resource.setAmount(resourceAmout);
+            resource.setName(resourceName);
+            resourcePojo.updateOrDeleteResource(resource);
+        } else {
+            throw new CommandInterpreterException("La sentencia usar requiere un numero y un recurso");
+        }
+
     }
 
     private static void handleListar() {

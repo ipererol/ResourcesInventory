@@ -13,4 +13,5 @@ public interface ResourceDAO {
     void updateResource(Resource resource);
     void deleteResource(Long resourceId);
     void createOrUpdateResource(Resource resource);
+    void updateOrDeleteResource(Resource resource);
 }
